@@ -17,12 +17,13 @@ for each  ele in relatedrcords
 	attachid.add(attachementId);
 }
 info attachid;
+
 //Download attachments
 for each  ele in attachid
 {
 	downloadFile = invokeurl
 	[
-		url :"https://www.zohoapis.com/crm/v2/CustomModule4/" + modelID + "/Attachments/" + ele
+		url :"https://www.zohoapis.eu/crm/v2/Models/" + modelID + "/Attachments/" + ele
 		type :GET
 		connection:"crmfunctions"
 	];
