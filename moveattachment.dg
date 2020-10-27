@@ -1,0 +1,32 @@
+// Copy Attachment
+//Get model email
+model = zoho.crm.getRecordById("Models",modelID);
+modelEmail = model.get("Email");
+info modelEmail;
+//Search Contact in Contacts Module with same Email
+contMatch = zoho.crm.searchRecords("Contacts","(Email:equals:" + modelEmail + ")");
+cont = contMatch.get(0);
+contID = cont.get("id");
+info contID;
+//Get all attachment IDs connected to Model
+relatedrcords = zoho.crm.getRelatedRecords("Attachments","Models",modelID);
+attachid = List();
+for each  ele in relatedrcords
+{
+	attachementId = ele.get("id");
+	attachid.add(attachementId);
+}
+info attachid;
+//Download attachments
+for each  ele in attachid
+{
+	downloadFile = invokeurl
+	[
+		url :"https://www.zohoapis.com/crm/v2/CustomModule4/" + modelID + "/Attachments/" + ele
+		type :GET
+		connection:"crmfunctions"
+	];
+	resp = zoho.crm.attachFile("Contacts",contID,downloadFile,"crmfunctions");
+	info resp;
+}
+return "resp";
