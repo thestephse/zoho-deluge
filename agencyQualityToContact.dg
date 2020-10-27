@@ -1,0 +1,11 @@
+account = zoho.crm.getRecordById("Accounts",agencyID);
+//info account;
+accQuality = account.get("Account_Quality");
+//info accQuality;
+contAcc = zoho.crm.getRelatedRecords("Contacts","Accounts",agencyID);
+for each  cont in contAcc
+{
+	contID = cont.get("id");
+	//info contID;
+	contUpdate = zoho.crm.updateRecord("Contacts",contID,{"Quality":accQuality});
+}

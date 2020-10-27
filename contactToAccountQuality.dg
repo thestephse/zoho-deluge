@@ -1,0 +1,26 @@
+contact = zoho.crm.getRecordById("Contacts",contactID);
+//info contact;
+contQuality = contact.get("Quality");
+accountName = contact.get("Account_Name");
+accountID = accountName.get("id");
+//info contQuality;
+//info accountID;
+account = zoho.crm.getRecordById("Accounts",accountID);
+accountQuality = account.get("Account_Quality");
+//Update of account only direction upwards
+if(contQuality == "A" && (accountQuality == "B" || accountQuality == "C" || accountQuality == "D"))
+{
+	accountUpdate = zoho.crm.updateRecord("Accounts",accountID,{"Account_Quality":contQuality});
+}
+else if(contQuality == "B" && (accountQuality == "B" || accountQuality == "C" || accountQuality == "D"))
+{
+	accountUpdate = zoho.crm.updateRecord("Accounts",accountID,{"Account_Quality":contQuality});
+}
+else if(contQuality == "C" && (accountQuality == "C" || accountQuality == "D"))
+{
+	accountUpdate = zoho.crm.updateRecord("Accounts",accountID,{"Account_Quality":contQuality});
+}
+else
+{
+	info "no update";
+}

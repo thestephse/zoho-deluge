@@ -1,0 +1,16 @@
+zacc = zoho.crm.getRecordById("Accounts",accountId);
+mp = Map();
+strr = zacc.get("Billing_Street");
+city = zacc.get("Billing_City");
+co = zacc.get("Billing_Code");
+count = zacc.get("Billing_Country");
+info mp;
+zcon = zoho.crm.getRelatedRecords("Contacts","Accounts",accountId);
+// // info zcon;
+for each  gete in zcon
+{
+	mail = gete.get("id");
+	//  info mp;
+	zx = zoho.crm.updateRecord("Contacts",mail,{"Mailing_Country":count,"Mailing_Street":strr,"Mailing_Zip":co,"Mailing_City":city});
+	//  info zx;
+}
