@@ -1,0 +1,31 @@
+zcon = zoho.crm.getRecordById("Contacts",CID);
+// info zcon;
+accou = zcon.get("Account_Name");
+accountid = accou.get("id");
+// info accountid;
+MStreet = zcon.get("Mailing_Street");
+MCity = zcon.get("Mailing_City");
+MZip = zcon.get("Mailing_Zip");
+Mcountry = zcon.get("Mailing_Country");
+status = zscon.get("Status");
+// info Mcountry;
+// info MStreet;
+// info MCity;
+// info MZip;
+accupdate = zoho.crm.updateRecord("Accounts",accountid,{"Billing_Street":MStreet,"Billing_City":MCity,"Billing_Code":MZip,"Billing_Country":Mcountry, "Status":status});
+// info accupdate;
+zcon = zoho.crm.getRelatedRecords("Contacts","Accounts",accountid);
+//info zcon;
+// mp = Map();
+// mp.put("Mailing Street",MStreet);
+// mp.put("Mailing City",MCity);
+// mp.put("Mailing Zip",MZip);
+// mp.put("Mailing Country",Mcountry);
+//  info mp;
+// // info zcon ;
+for each  gete in zcon
+{
+	mail = gete.get("id");
+	info mail;
+	zx = zoho.crm.updateRecord("Contacts",mail,{"Mailing_Country":Mcountry,"Mailing_Street":MStreet,"Mailing_Zip":MZip,"Mailing_City":MCity});
+}
