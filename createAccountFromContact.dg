@@ -1,0 +1,60 @@
+//Get Contact Infos
+cont = zoho.crm.getRecordById("Contacts",contID);
+firstN = cont.get("First_Name");
+lastN = cont.get("Last_Name");
+Street = cont.get("Mailing_Street");
+Zip = cont.get("Mailing_Zip");
+Country = cont.get("Mailing_Country");
+City = cont.get("Mailing_City");
+type = cont.get("Type");
+email = cont.get("Email");
+quality = cont.get("Quality");
+category = cont.get("Client_category");
+phone = cont.get("Phone");
+// Create Account Name and Accounting Name
+nameacc = firstN + " " + lastN;
+nameaccounting = firstN;
+//Search for existing account
+searchAcc = zoho.crm.searchRecords("Accounts","(Account_Name:equals:" + nameacc + ")");
+//Check if Account was found
+check = searchAcc.isEmpty();
+info check;
+if(check == TRUE)
+{
+	// If no account was found
+	info "Account does not exist yet";
+	//Map Fields
+	acto = Map();
+	acto.put("Account_Type","Model");
+	acto.put("Account_Name",nameacc);
+	acto.put("Account_Quality","A");
+	acto.put("Billing_Street",Street);
+	acto.put("Billing_Code",Zip);
+	acto.put("Billing_City",City);
+	acto.put("Billing_Country",Country);
+	acto.put("Phone",phone);
+	acto.put("Account_Quality",quality);
+	acto.put("Account_Category",category);
+	acto.put("Accounting_Mail",email);
+	acto.put("Accounting_Name",nameaccounting);
+	//Create Account
+	createacc = zoho.crm.createRecord("Accounts",acto);
+	mp = Map();
+	mp.put("Account_Name",nameacc);
+	update = zoho.crm.updateRecord("Contacts",contID,mp);
+}
+// If account was found
+else
+{
+	//Connect Account to Contact
+	accFound = searchAcc.get(0);
+	info accFound;
+	account = accFound.get("Account_Name");
+	info account;
+	mp = Map();
+	mp.put("Account_Name",account);
+	update = zoho.crm.updateRecord("Contacts",contID,mp);
+}
+
+//if button
+return "";
