@@ -15,14 +15,8 @@ type = zscon.get("Type");
 accupdate = zoho.crm.updateRecord("Accounts",accountid,{"Billing_Street":MStreet,"Billing_City":MCity,"Billing_Code":MZip,"Billing_Country":Mcountry, "Account_Type":type});
 // info accupdate;
 zcon = zoho.crm.getRelatedRecords("Contacts","Accounts",accountid);
-//info zcon;
-// mp = Map();
-// mp.put("Mailing Street",MStreet);
-// mp.put("Mailing City",MCity);
-// mp.put("Mailing Zip",MZip);
-// mp.put("Mailing Country",Mcountry);
-//  info mp;
-// // info zcon ;
+
+// Update related records of account
 for each  gete in zcon
 {
 	mail = gete.get("id");
