@@ -1,0 +1,23 @@
+placement = zoho.crm.getRecordById("Placements",plID);
+accountName = placement.get("Agency");
+accID = accountName.get("id");
+account = zoho.crm.getRelatedRecords("Accounts","Placements",plID);
+account = zoho.crm.getRecordById("Accounts",accID);
+accName = account.get("Account_Name");
+accountant = zoho.crm.searchRecords("Contacts","((Account_Name:equals:" + accName + ")and(Type:equals:Accounting))");
+if(accountant.isEmpty())
+{
+	return "The agency needs a contact with Type Accountant";
+}
+else
+{
+	accountantIndex = accountant.get(0);
+	accountantID = accountantIndex.get("id");
+	accountantRecord = zoho.crm.getRecordById("Contacts",accountantID);
+	accountantName = accountantRecord.get("First_Name");
+	accountantEmail = accountantRecord.get("Email");
+	addName = zoho.crm.updateRecord("Placements",plID,{"Name_Accountant":accountantName});
+	addEmail = zoho.crm.updateRecord("Placements",plID,{"Email_Accountant":accountantEmail});
+}
+//message "Accountant added";
+return "";
