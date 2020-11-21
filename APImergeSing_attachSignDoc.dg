@@ -1,0 +1,82 @@
+crmAPIRequestMap = crmAPIRequest.toMap();
+request_body = crmAPIRequestMap.get("body");
+info request_body;
+requestMap = request_body.toMap();
+response = Map();
+response.put("status_code",200);
+response.put("Content-Type","application/json");
+hasRequests = requestMap.containKey("requests");
+if(requestMap.containKey("requests"))
+{
+	requestStr = requestMap.get("requests");
+	requestObj = requestStr.toMap();
+	response.put("body",{"what we got":requestObj});
+	if(requestObj.containKey("request_status"))
+	{
+		if(requestObj.get("request_status").equals("completed"))
+		{
+			requestId = requestObj.get("request_id");
+			response.put("body",{"request_id":requestId});
+			actions = requestObj.get("actions");
+			email = "";
+			order = 1000;
+			for each  action in actions
+			{
+				if(action.get("action_type").equals("SIGN") && action.get("signing_order") < order)
+				{
+					order = action.get("signing_order");
+					email = action.get("recipient_email");
+				}
+			}
+			records = zoho.crm.searchRecords("Contacts","(Email:equals:" + email + ")");
+			if(records.size() > 0)
+			{
+				info "Record found";
+				leadid = records.get(0).get("id");
+				recordInfo = {"Name":requestObj.get("request_name"),"zohosign__Contact":leadid,"zohosign__Document_Status":"Signed","zohosign__ZohoSign_Document_ID":requestId,"zohosign__Date_Completed":today};
+				resp = zoho.crm.createRecord("zohosign__ZohoSign_Documents",recordInfo);
+				if(resp.containKey("id"))
+				{
+					zsDocId = resp.get("id");
+					respDoc = zoho.sign.downloadDocument(requestId);
+					zoho.crm.attachFile("zohosign__ZohoSign_Documents",zsDocId,respDoc);
+					response.put("body",{"attached to record":zsDocId});
+					//Create zoho sign recipients record for all recipients
+					for each  action in actions
+					{
+						recpRecordInfo = {"Name":action.get("recipient_name"),"zohosign__Email":action.get("recipient_email"),"zohosign__ZohoSign_Document":zsDocId,"zohosign__Recipient_Order":action.get("signing_order"),"zohosign__Recipient_Type":action.get("action_type")};
+						zoho.crm.createRecord("zohosign__ZohoSign_Recipients",recpRecordInfo);
+					}
+				}
+				else
+				{
+					response.put("body",{"error":resp});
+				}
+			}
+		}
+		else
+		{
+			response.put("body",{"not completed":requestObj});
+		}
+	}
+	else
+	{
+		response.put("body",{"no request status":requestObj});
+	}
+}
+else
+{
+	info "Error";
+	response.put("body",{"error":"No requests key"});
+}
+return {"crmAPIResponse":response};
+
+
+
+
+
+/*
+API Setting for Zoho Sign (only on document completion)
+
+https://www.zohoapis.eu/crm/v2/functions/signattachment/actions/execute?auth_type=apikey&zapikey=1003.436dd090e0fc88f380b112f391c80044.647c54c831929b86f6d5be98c3d47a1c
+*/
