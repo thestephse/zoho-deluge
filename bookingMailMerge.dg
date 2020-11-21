@@ -1,0 +1,94 @@
+getbooking = zoho.crm.getRecordById("Bookings",bookingID);
+type = getbooking.get("Booking_Type");
+ownername = getbooking.get("Owner").get("name");
+contact = getbooking.get("Contact");
+contactID = contact.get("id");
+getContact = zoho.crm.getRecordById("Contacts",contactID);
+fname = getContact.get("First_Name");
+lname = getContact.get("Last_Name");
+email = getContact.get("Email");
+fullname = fname + " " + lname;
+bdate = getbooking.get("Date");
+if(type == "Testshooting")
+{
+	models = getbooking.get("Models");
+	sd = {{"recipient_1":email,"recipient_name":fullname}};
+	md = "{\"data\":[{\"Owner\":" + ownername + ",\"First_Name\":" + fname + ",\"Last_Name\":" + lname + ",\"Email\":" + email + ",\"Models\":" + models + ",\"Date\":" + bdate + ",\"Contact.First_Name\":" + fname + ",\"Contact.Last_Name\":" + lname + ",\"Contact.Email\":" + email + "}]}";
+	info md;
+	mp = Map();
+	mp.put("service_name","zohosign");
+	mp.put("filename","Testshooting_" + fname + lname);
+	mp.put("subject","Testshooting with " + models + " on " + bdate);
+	mp.put("signer_data",sd);
+	mp.put("merge_data",md);
+	mergesign = invokeurl
+	[
+		url :"https://writer.zoho.eu/api/v1/documents/4yfg0c60008160a404bf7890df143b48f78dc/merge/sign"
+		type :POST
+		parameters:mp
+		connection:"sign2"
+	];
+	return "Success";
+}
+else
+{
+	//Booking Fields
+	data = Map();
+	data.put("Duration",getbooking.get("Duration"));
+	data.put("Agency_Commisson",getbooking.get("Agency_Commisson"));
+	data.put("Name",getbooking.get("Name"));
+	data.put("Client.Account_Name",getbooking.get("Client").get("name"));
+	data.put("Media",getbooking.get("Media"));
+	data.put("Period",getbooking.get("Period"));
+	data.put("Product",getbooking.get("Products"));
+	data.put("Territory",getbooking.get("Territory"));
+	data.put("Travel",getbooking.get("Travel"));
+	data.put("Date",bdate);
+	data.put("Contact.First_Name",fname);
+	data.put("Contact.Last_Name",lname);
+	//Client Fields
+	clientID = getbooking.get("Client").get("id");
+	clientAcc = zoho.crm.getRecordById("Accounts",clientID);
+	data.put("Client.Billing_Street",clientAcc.get("Billing_Street"));
+	data.put("Client.Billing_Code",clientAcc.get("Billing_Code"));
+	data.put("Client.Billing_City",clientAcc.get("Billing_City"));
+	data.put("Client.Billing_Country",clientAcc.get("Billing_Country"));
+	data.put("Client.VAT",clientAcc.get("VAT"));
+	data.put("Number",getbooking.get("Order_Number"));
+	data.put("Owner",ownername);
+	//Get Products from subform
+	modelList = List();
+	modelMap = Map();
+	subform = getbooking.get("Cost_subform");
+	for each m in subform
+	{
+
+		modelMap.put("Cost_subform.costs_model",m.get("costs_model").get("name"));
+		modelMap.put("Cost_subform.costs_rate",m.get("costs_rate"));
+		modelList.add(modelMap);
+		info modelList;
+		
+		
+		
+	}
+	data.put("Cost_subform",modelList);
+	info data;
+	sd = {{"recipient_1":email,"recipient_name":fullname}};
+	mp = Map();
+	mp.put("service_name","zohosign");
+	mp.put("filename",getbooking.get("Name"));
+	mp.put("subject","Bookingconfirmation (" + getbooking.get("Name") + ")");
+	mp.put("signer_data",sd);
+	mp.put("merge_data",{"data":data});
+	/*
+	mergesign = invokeurl
+	[
+		url :"https://writer.zoho.eu/api/v1/documents/4y2up7265f6dc8e7448e99e69633618c233ce/merge/sign"
+		type :POST
+		parameters:mp
+		connection:"sign2"
+	];
+	*/
+	return "Success";
+}
+return "";
