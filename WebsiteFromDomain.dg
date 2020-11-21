@@ -1,0 +1,33 @@
+contact = zoho.crm.getRecordById("Contacts",contactID);
+//Get existing websites
+web = contact.get("Web");
+website = contact.get("Website");
+//Get email and create domain
+email = contact.get("Email");
+at = email.indexOf("@");
+count = email.len();
+cut = count - at - 1;
+domain = email.right(cut);
+//Check if domain is from personal website
+if(website == Null)
+{
+	if(domain.contains("gmail") || domain.contains("me.com"))
+	{
+		info "Stop";
+	}
+	else
+	{
+		//Update Website
+		www = "www." + domain;
+		updateRecord = zoho.crm.updateRecord("Contacts",contactID,{"Web":www});
+	}
+}
+//If Website contains something
+else
+{
+	//Only if Web contains nothing
+	if(web == Null)
+	{
+		updateRecord2 = zoho.crm.updateRecord("Contacts",contactID,{"Web":website,"Website":""});
+	}
+}
